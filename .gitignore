@@ -1,0 +1,5 @@
+*.pyc
+*.obj
+*.p
+.idea/
+code/main/tmp
