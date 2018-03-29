@@ -77,9 +77,12 @@ class Solver:
 
         # inference mode
         else:
-            encoder_outputs = self.model_obj.getEncoderModel(config, mode='inference', reuse=reuse)
-            self.decoder_outputs_inference, self.encoder_outputs, self.alpha_inference = \
-                self.model_obj.getDecoderModel(config, encoder_outputs, is_training=False, mode='inference', reuse=False )
+            encoder_outputs = self.model_obj.getEncoderModel(config,
+                                            mode='inference', reuse=reuse)
+            self.decoder_outputs_inference, self.encoder_outputs, \
+                        self.alpha_inference = \
+                self.model_obj.getDecoderModel(config,
+                    encoder_outputs, is_training=False, mode='inference', reuse=False )
 
     def trainModel(self, config, train_feed_dict, val_feed_dct, reverse_vocab, do_init=True):
 

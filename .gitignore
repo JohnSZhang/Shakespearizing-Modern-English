@@ -3,3 +3,4 @@
 *.p
 .idea/
 code/main/tmp
+inference/data/models

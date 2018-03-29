@@ -187,6 +187,7 @@ class PreProcessing:
         inputs, outputs = sequences
 
         decoder_inputs = np.array( [ sequence[:-1] for sequence in outputs ] )
+        #decoder_outputs = np.array( [ np.expand_dims(sequence[1:],-1) for sequence in outputs ] )
         decoder_outputs = np.array( [ sequence[1:] for sequence in outputs ] )
         matching_input_token = []
         for cur_outputs, cur_inputs in zip(decoder_outputs, inputs):

@@ -71,10 +71,13 @@ def main():
         splits =["train","valid","test"]
         #for split in splits: preprocessing.loadVocab(split)
         preprocessing.loadVocab('train')
+
         if params['do_vocab_pruning']:
             preprocessing.pruneVocab(max_vocab_size=params['max_vocab_size'])
+
         data_seq = {split:preprocessing.loadData(split=split) for split in splits}
         data = { split:preprocessing.prepareMTData(cur_data) for split,cur_data in data_seq.items()  }
+
         for split,split_data in data.items():
             #print "Split: ",split
             inp,dinp,dout,dout_inp_matches = split_data
@@ -175,11 +178,17 @@ def main():
         print "----Running inference-----"
 
         #val
-        val_encoder_inputs, val_decoder_inputs, val_decoder_outputs, val_decoder_outputs_matching_inputs = val
+        val_encoder_inputs, val_decoder_inputs, val_decoder_outputs, \
+            val_decoder_outputs_matching_inputs = val
         #print "val_encoder_inputs = ",val_encoder_inputs
-        if len(val_decoder_outputs.shape)==3:
+
+        if len(val_decoder_outputs.shape) == 3:
             val_decoder_outputs=np.reshape(val_decoder_outputs, (val_decoder_outputs.shape[0], val_decoder_outputs.shape[1]))
-        decoder_outputs_inference, decoder_ground_truth_outputs = rnn_model.solveAll(params, val_encoder_inputs, val_decoder_outputs, preprocessing.idx_to_word, inference_type=inference_type)
+
+        decoder_outputs_inference, decoder_ground_truth_outputs = \
+            rnn_model.solveAll(params, val_encoder_inputs,
+                               val_decoder_outputs, preprocessing.idx_to_word, inference_type=inference_type)
+
         validOutFile_name = saved_model_path+".valid.output"
         original_data_path = data_src + "valid.original.nltktok"
         BLEUOutputFile_path = saved_model_path + ".valid.BLEU"
@@ -196,22 +205,6 @@ def main():
         BLEUOutputFile_path = saved_model_path + ".test.BLEU"
         utilities.getBlue(validOutFile_name, original_data_path, BLEUOutputFile_path, decoder_outputs_inference, decoder_ground_truth_outputs, preprocessing)
         print "TEST: ",open(BLEUOutputFile_path,"r").read()
-
-    elif mode == "custominference":
-        saved_model_path = sys.argv[2]
-        print "saved_model_path = ",saved_model_path
-        inference_type = sys.argv[3] # greedy / beam
-        print "inference_type = ",inference_type
-        params['saved_model_path'] = saved_model_path
-        rnn_model = solver.Solver(params, buckets=None, mode='inference')
-        _ = rnn_model.getModel(params, mode='inference', reuse=False, buckets=None)
-        print "----Running inference-----"
-
-        test_encoder_inputs, test_decoder_inputs, test_decoder_outputs, test_decoder_outputs_matching_inputs = test
-        if len(test_decoder_outputs.shape)==3:
-            test_decoder_outputs=np.reshape(test_decoder_outputs, (test_decoder_outputs.shape[0], test_decoder_outputs.shape[1]))
-        decoder_outputs_inference, decoder_ground_truth_outputs = rnn_model.solveAll(params, test_encoder_inputs, test_decoder_outputs, preprocessing.idx_to_word, inference_type=inference_type)
-
 
     else:
         print "Please see usage"
